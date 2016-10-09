@@ -1,0 +1,26 @@
+{
+  "name": "js-module-indexer",
+  "version": "0.0.1",
+  "description": "JS module indexer returns all the exported objects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madhusudhand/js-module-indexer.git"
+  },
+  "keywords": [
+    "indexer"
+  ],
+  "author": "Madhusudhan Dollu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/madhusudhand/js-module-indexer/issues"
+  },
+  "homepage": "https://github.com/madhusudhand/js-module-indexer#readme",
+  "dependencies": {
+    "acorn": "^4.0.3",
+    "lodash": "^4.16.4"
+  }
+}
