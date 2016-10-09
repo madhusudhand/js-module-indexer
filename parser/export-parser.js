@@ -28,7 +28,9 @@ const exportParser = {
 
     const modulePath = path.join(basePath, moduleName);
     this.getExportDeclarations(modulePath, config.entry);
-    return this.format(this.exportDeclarations);
+    const exportDeclarations = [];
+    exportDeclarations.push(this.format(this.exportDeclarations));
+    return exportDeclarations;
   },
 
   format: function(list) {
