@@ -13,7 +13,7 @@ const exportParser = {
     this.exportDeclarations = {
       variables: [],
       functions: [],
-      classes  : [],
+      specifiers: [],
     };
 
     if (this.config.entry.slice(-3) === this.config.extension){
@@ -24,6 +24,7 @@ const exportParser = {
   parse: function(moduleName, basePath, config) {
     this.config = config;
     this.moduleName = moduleName;
+    this.basePath = basePath;
     this.init();
 
     const modulePath = path.join(basePath, moduleName);
@@ -36,15 +37,25 @@ const exportParser = {
   format: function(list) {
     return {
       source   : this.moduleName,
+      basePath : this.basePath,
       variables: _.reduce(list.variables, (flattened, arr) => {
                     return flattened.concat(arr);
-                  }, []),
+                  }, [])
+                  .map((v) => {
+                    return { name: v };
+                  }),
       functions: _.reduce(list.functions, (flattened, arr) => {
                     return flattened.concat(arr);
-                  }, []),
-      classes  : _.reduce(list.classes, (flattened, arr) => {
+                  }, [])
+                  .map((f) => {
+                    return { name: f };
+                  }),
+      specifiers: _.reduce(list.specifiers, (flattened, arr) => {
                     return flattened.concat(arr);
-                  }, []),
+                  }, [])
+                  .map((s) => {
+                    return { name: s };
+                  }),
     };
   },
 
@@ -91,7 +102,7 @@ const exportParser = {
     if (!specifiers) {
       return;
     }
-    this.exportDeclarations.classes.push(
+    this.exportDeclarations.specifiers.push(
       specifiers.map((specifier) => {
         return specifier.exported.name;
       })
@@ -125,3 +136,4 @@ const exportParser = {
 
 
 module.exports = exportParser;
+

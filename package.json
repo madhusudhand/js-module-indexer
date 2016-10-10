@@ -1,6 +1,6 @@
 {
   "name": "js-module-indexer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "JS module indexer returns all the exported objects",
   "main": "index.js",
   "scripts": {
