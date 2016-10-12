@@ -6,7 +6,7 @@ const acorn = require('acorn');
 const _     = require('lodash');
 
 const exportParser = {
-  config: {},
+  options: {},
   exportDeclarations: {},
 
   init: function() {
@@ -16,51 +16,35 @@ const exportParser = {
       specifiers: [],
     };
 
-    if (this.config.entry.slice(-3) === this.config.extension){
-      this.config.entry = this.config.entry.slice(0, -3);
+    if (this.options.entry.slice(-3) === this.options.extension){
+      this.options.entry = this.options.entry.slice(0, -3);
     }
   },
 
-  parse: function(moduleName, basePath, config) {
-    this.config = config;
+  parseModule: function(moduleName, basePath, options) {
+    this.options = options;
     this.moduleName = moduleName;
     this.basePath = basePath;
     this.init();
 
     const modulePath = path.join(basePath, moduleName);
-    this.getExportDeclarations(modulePath, config.entry);
+    this.parse(modulePath, options.entry);
+
     const exportDeclarations = [];
     exportDeclarations.push(this.format(this.exportDeclarations));
     return exportDeclarations;
   },
 
-  format: function(list) {
-    return {
-      source   : this.moduleName,
-      basePath : this.basePath,
-      variables: _.reduce(list.variables, (flattened, arr) => {
-                    return flattened.concat(arr);
-                  }, [])
-                  .map((v) => {
-                    return { name: v };
-                  }),
-      functions: _.reduce(list.functions, (flattened, arr) => {
-                    return flattened.concat(arr);
-                  }, [])
-                  .map((f) => {
-                    return { name: f };
-                  }),
-      specifiers: _.reduce(list.specifiers, (flattened, arr) => {
-                    return flattened.concat(arr);
-                  }, [])
-                  .map((s) => {
-                    return { name: s };
-                  }),
-    };
+  parseFile: function(file, options) {
+    return null;
   },
 
-  getExportDeclarations: function(basePath, location) {
-    const fullPath = path.join(basePath, location + this.config.extension);
+  parseContent: function(text, options) {
+    return null;
+  },
+
+  parse: function(basePath, location) {
+    const fullPath = path.join(basePath, location + this.options.extension);
 
     let content;
     try {
@@ -71,18 +55,17 @@ const exportParser = {
     }
 
     const parser = acorn.parse(content, {
-      sourceType: this.config.sourceType,
+      sourceType: this.options.sourceType,
     });
 
     _.forEach(parser.body, (node) => {
       if (node.type === 'ExportNamedDeclaration') {
         this.parseNode(node);
       } else if (node.type === 'ExportAllDeclaration') {
-        this.getExportDeclarations(path.dirname(fullPath), node.source.value);
+        this.parse(path.dirname(fullPath), node.source.value);
       }
     });
   },
-
 
   parseNode: function(node) {
     if (node.declaration) {
@@ -132,8 +115,33 @@ const exportParser = {
     this.exportDeclarations.functions.push(names);
   },
 
+
+  format: function(list) {
+    return {
+      source   : this.moduleName,
+      basePath : this.basePath,
+      variables: _.reduce(list.variables, (flattened, arr) => {
+                    return flattened.concat(arr);
+                  }, [])
+                  .map((v) => {
+                    return { name: v };
+                  }),
+      functions: _.reduce(list.functions, (flattened, arr) => {
+                    return flattened.concat(arr);
+                  }, [])
+                  .map((f) => {
+                    return { name: f };
+                  }),
+      specifiers: _.reduce(list.specifiers, (flattened, arr) => {
+                    return flattened.concat(arr);
+                  }, [])
+                  .map((s) => {
+                    return { name: s };
+                  }),
+    };
+  },
+
 };
 
 
 module.exports = exportParser;
-
